@@ -12,6 +12,7 @@ export interface TMDB_MOVIE {
 	backdrop_path: string;
 	overview: string;
 }
+
 interface TMDB_RESPONSE {
 	page: number;
 	results: TMDB_MOVIE[];

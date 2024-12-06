@@ -1,28 +1,29 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
-	import { onMount, type Snippet } from 'svelte';
+	import { onMount, setContext, type Snippet } from 'svelte';
 	import '../app.css';
 	import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 	import type { PageData } from './$types';
 	import { storePopup, initializeStores, Modal, type ModalComponent } from '@skeletonlabs/skeleton';
 	import MovieDetailsModal from '../components/MovieDetailsModal.svelte';
+	import { writable } from 'svelte/store';
+	import type { Rating } from '../types';
 	initializeStores();
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
-	let { data, children }: { data: PageData; children: Snippet } = $props();
-	const { session, supabase } = data;
+	let { children }: { data: PageData; children: Snippet } = $props();
 	const modalRegistry: Record<string, ModalComponent> = {
 		movieDetailsModal: { ref: MovieDetailsModal }
 	};
 
-	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
-			if (newSession?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth');
-			}
-		});
-
-		return () => data.subscription.unsubscribe();
+	const ratings = writable<Rating[]>([]);
+	const fetchInitialRatings = async () => {
+		const res = await fetch('/api/ratings');
+		const userRatings = (await res.json()) as Rating[];
+		$ratings = userRatings;
+	};
+	onMount(async () => {
+		await fetchInitialRatings();
 	});
+	setContext('ratings', ratings);
 </script>
 
 <Modal components={modalRegistry} />

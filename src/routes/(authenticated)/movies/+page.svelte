@@ -5,6 +5,8 @@
 	import { type PageData } from './$types';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
 	import InfiniteScroll from '../../../components/InfiniteScroll.svelte';
+	import { getContext } from 'svelte';
+	import type { Rating } from '../../../types';
 	let { data }: { data: PageData } = $props();
 	let movies = $state(data.movies);
 	let searchTerm = $state('');
@@ -35,6 +37,13 @@
 		currentPage = 1;
 		fetchMovies(searchTerm, 1);
 	});
+	let ratings = $state<Rating[]>([]);
+	const ratingsContext = getContext('ratings');
+	$effect(() => {
+		if ($ratingsContext) {
+			ratings = [...$ratingsContext];
+		}
+	});
 </script>
 
 <div class="p-8">
@@ -54,7 +63,7 @@
 
 	<div class="flex flex-wrap justify-between gap-4">
 		{#each movies as movie}
-			<MovieCard {movie} />
+			<MovieCard {movie} rating={ratings.find((r) => r.movieId === movie.id)} />
 		{/each}
 	</div>
 	<InfiniteScroll

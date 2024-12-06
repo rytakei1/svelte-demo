@@ -2,16 +2,30 @@
 	import '../app.css';
 	import { DotLottieSvelte } from '@lottiefiles/dotlottie-svelte';
 	import { type PageData } from './$types';
+	import { authClient } from '$lib/auth-client';
+	import { redirect } from '@sveltejs/kit';
+	import { goto } from '$app/navigation';
 	let { data }: { data: PageData } = $props();
-	const { supabase } = data;
+	// const { supabase } = data;
 	// export let data;
 	// $: ({ supabase } = data);
 
 	const handleLoginWithGoogle = async () => {
-		const res = await supabase.auth.signInWithOAuth({
-			provider: 'google',
-			options: { redirectTo: 'http://localhost:5173/auth/callback?next=/movies' }
-		});
+		// const res = await supabase.auth.signInWithOAuth({
+		// 	provider: 'google',
+		// 	options: { redirectTo: 'http://localhost:5173/auth/callback?next=/movies' }
+		// });
+		await authClient.oneTap({
+			fetchOptions: {
+				onSuccess: () => {
+					console.log('OK')
+					goto('/movies')
+				}
+			}
+		})
+		// await authClient.signIn.social({
+		// 	provider: 'google'
+		// })
 	};
 </script>
 

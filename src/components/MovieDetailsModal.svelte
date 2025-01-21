@@ -4,7 +4,6 @@
 	import IconPlus from '~icons/mdi/plus';
 	import IconX from '~icons/mdi/close';
 	import IconSave from '~icons/material-symbols-light/save';
-	import type { Rating } from '../types';
 	import { getContext } from 'svelte';
 	const modalStore = getModalStore();
 	const { movie, onAddMovie, onRemoveMovie, onUpdateMovie } = $modalStore[0].meta as {

@@ -7,6 +7,7 @@
 	import { getContext } from 'svelte';
 	import type { Rating } from '../types';
 	const { movie, rating }: { movie: TMDB_MOVIE; rating: Rating | undefined } = $props();
+	const modalStore = getModalStore();
 	const getPosterUrl = (posterPath: string) => {
 		if (!posterPath) return 'https://placehold.co/200x300';
 		return `https://image.tmdb.org/t/p/w200${posterPath}`;
@@ -27,6 +28,7 @@
 		});
 		const userRatings = await res.json();
 		$ratingsContext = userRatings;
+		modalStore.close();
 	};
 
 	const handleUpdateMovie = async (movieId: number, rating: number) => {
@@ -37,9 +39,10 @@
 		});
 		const userRatings = await res.json();
 		$ratingsContext = userRatings;
+		modalStore.close();
 	};
 
-	const modalStore = getModalStore();
+	
 
 	const handleClick = () => {
 		const modal: ModalSettings = {

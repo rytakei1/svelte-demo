@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { ratingsStore } from '../../../stores/ratingsStore';
 	import IconTrash from '~icons/mdi/trash-can';
-	const ratingsContext = getContext('ratings');
+
 	const handleDeleteEntry = async (movieId: number) => {
 		const res = await fetch(`/api/ratings/${movieId}`, {
 			method: 'DELETE'
 		});
 		const userRatings = await res.json();
-		$ratingsContext = userRatings;
+		$ratingsStore = userRatings;
 	};
 </script>
 
@@ -21,7 +21,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each $ratingsContext || [] as row, i}
+			{#each $ratingsStore || [] as row, i}
 				<tr>
 					<td class="align-middle">{row.movieName}</td>
 					<td>{row.rating}</td>
@@ -34,7 +34,7 @@
 		<tfoot>
 			<tr>
 				<th>Total Movies</th>
-				<td colspan="2">{$ratingsContext?.length}</td>
+				<td colspan="2">{$ratingsStore?.length}</td>
 			</tr>
 		</tfoot>
 	</table>

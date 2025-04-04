@@ -9,7 +9,6 @@ export const load: LayoutServerLoad = async ({ request, fetch }) => {
 	if (!session) {
 		redirect(303, '/');
 	} else {
-		console.log('authenticated');
 		await fetch('/api/login');
 	}
 };

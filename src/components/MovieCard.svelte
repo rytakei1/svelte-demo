@@ -4,15 +4,15 @@
 	import IconStarEmpty from '~icons/ic/baseline-star-outline';
 	import IconStarHalf from '~icons/ic/baseline-star-half';
 	import IconStarFull from '~icons/ic/baseline-star';
-	import { getContext } from 'svelte';
 	import type { Rating } from '../types';
+	import { ratingsStore } from '../stores/ratingsStore';
+
 	const { movie, rating }: { movie: TMDB_MOVIE; rating: Rating | undefined } = $props();
 	const modalStore = getModalStore();
 	const getPosterUrl = (posterPath: string) => {
 		if (!posterPath) return 'https://placehold.co/200x300';
 		return `https://image.tmdb.org/t/p/w200${posterPath}`;
 	};
-	const ratingsContext = getContext('ratings');
 	const handleAddMovie = async () => {
 		const res = await fetch(`/api/ratings`, {
 			method: 'POST',
@@ -20,14 +20,14 @@
 			body: JSON.stringify({ movie: movie.id, posterPath: movie.poster_path, name: movie.title })
 		});
 		const userRatings = await res.json();
-		$ratingsContext = userRatings;
+		$ratingsStore = userRatings;
 	};
 	const handleRemoveMovie = async (movieId: number) => {
 		const res = await fetch(`/api/ratings/${movieId}`, {
 			method: 'DELETE'
 		});
 		const userRatings = await res.json();
-		$ratingsContext = userRatings;
+		$ratingsStore = userRatings;
 		modalStore.close();
 	};
 
@@ -38,7 +38,7 @@
 			body: JSON.stringify({ rating })
 		});
 		const userRatings = await res.json();
-		$ratingsContext = userRatings;
+		$ratingsStore = userRatings;
 		modalStore.close();
 	};
 

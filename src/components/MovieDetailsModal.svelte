@@ -4,7 +4,9 @@
 	import IconPlus from '~icons/mdi/plus';
 	import IconX from '~icons/mdi/close';
 	import IconSave from '~icons/material-symbols-light/save';
-	import { getContext } from 'svelte';
+	import { ratingsStore } from '../stores/ratingsStore';
+	import type { Rating } from '../types';
+
 	const modalStore = getModalStore();
 	const { movie, onAddMovie, onRemoveMovie, onUpdateMovie } = $modalStore[0].meta as {
 		movie: TMDB_MOVIE;
@@ -12,11 +14,10 @@
 		onRemoveMovie: (movieId: number) => Promise<void>;
 		onUpdateMovie: (movieId: number, rating: number) => Promise<void>;
 	};
-	const ratingsContext = getContext('ratings');
-	let rating = $state(null);
-	let localRating = $state(0);
+	let rating = $state<Rating | undefined>(undefined);
+	let localRating = $state<number | undefined>(undefined);
 	$effect(() => {
-		rating = $ratingsContext?.find((r) => r.movieId === movie.id);
+		rating = $ratingsStore?.find((r: Rating) => r.movieId === movie.id);
 		localRating = rating?.rating;
 	});
 	const getImageUrl = (path: string) => {
@@ -44,8 +45,13 @@
 					<div class="flex items-center gap-4">
 						<input class="input" type="number" max="10" min="0" step="1" bind:value={localRating} />
 						<button
-							onclick={() => onUpdateMovie(movie.id, localRating)}
+							onclick={() => {
+								if (localRating !== undefined) {
+									onUpdateMovie(movie.id, localRating);
+								}
+							}}
 							class="variant-filled btn flex items-center bg-primary-700 font-bold uppercase text-white"
+							disabled={localRating === undefined}
 						>
 							<IconSave />
 							<span> Save </span>

@@ -5,8 +5,8 @@
 	import type { PageData } from './$types';
 	import { storePopup, initializeStores, Modal, type ModalComponent } from '@skeletonlabs/skeleton';
 	import MovieDetailsModal from '../components/MovieDetailsModal.svelte';
-	import { writable } from 'svelte/store';
 	import type { Rating } from '../types';
+	import { ratingsStore } from '../stores/ratingsStore';
 	initializeStores();
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 	let { children }: { data: PageData; children: Snippet } = $props();
@@ -14,16 +14,15 @@
 		movieDetailsModal: { ref: MovieDetailsModal }
 	};
 
-	const ratings = writable<Rating[]>([]);
 	const fetchInitialRatings = async () => {
 		const res = await fetch('/api/ratings');
 		const userRatings = (await res.json()) as Rating[];
-		$ratings = userRatings;
+		$ratingsStore = userRatings;
 	};
+
 	onMount(async () => {
 		await fetchInitialRatings();
 	});
-	setContext('ratings', ratings);
 </script>
 
 <Modal components={modalRegistry} />
